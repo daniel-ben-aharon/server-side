@@ -1,0 +1,12 @@
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\bin\Debug\TestAssignment2020.exe.config
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\bin\Debug\TestAssignment2020.exe
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\bin\Debug\TestAssignment2020.pdb
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\bin\Debug\EntityFramework.dll
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\bin\Debug\EntityFramework.SqlServer.dll
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\bin\Debug\EntityFramework.xml
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\bin\Debug\EntityFramework.SqlServer.xml
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\obj\Debug\DATA.csprojAssemblyReference.cache
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\obj\Debug\DATA.csproj.CoreCompileInputs.cache
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\obj\Debug\DATA.csproj.CopyComplete
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\obj\Debug\TestAssignment2020.exe
+C:\Users\דניאל בן אהרון\source\repos\TestAssignment2020\TestAssignment2020\obj\Debug\TestAssignment2020.pdb

@@ -1,0 +1,312 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>רכישת שירים</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>  <!--// w3 library-->
+    <style>
+
+        #HeadersPurchase {
+            background-color: yellow;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+            padding: 12px;
+        }
+
+        thead, tbody {
+            display: block;
+        }
+
+        tbody {
+            height: 200px; /* Just for the demo          */
+            overflow-y: auto; /* Trigger vertical scroll    */
+            overflow-x: hidden; /* Hide the horizontal scroll */
+        }
+
+        .buttonload, .buttonUpdate {
+            background-color: blue;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            font-size: 20px;
+            display: none;
+        }
+
+        a {
+            margin: 30px;
+            font-size: medium;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+        }
+
+        span {
+            color: black;
+            font-size: large;
+            font-family: 'Times New Roman';
+        }
+
+        h1, h2 {
+            color: cornflowerblue;
+            font-family: 'David';
+        }
+
+        #PurchseDetails:hover {
+            background-color: darkgrey !important;
+        }
+
+        thead {
+            background-color: greenyellow
+        }
+    </style>
+
+    <script src="../Scripts/jquery-3.3.1.js"></script>
+    <script>
+        $(document).ready(function () {
+            alert("Welcome to purchase songs store!! \nPick songs you would like to buy.\nNotice you can filter details by one catagory each time\n Press ok to go to purchase page");
+
+            $(".buttonload").css("display", "inline");
+            $("#UserInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $(".item").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            })
+
+            $.ajax({
+                dataType: "json",			            //סוג הנתונים שאנחנו מצפים לקבל מהשרת
+                url: "/api/PurchaseSearch/",	        //הכתובת לשרת ולפונקציה
+                contentType: "application/json",	    //סוג הנתונים שאנחנו שולחים לשרת
+                type: "GET",				            //סוג הפעולה
+                //data: JSON.stringify({}),			    //הנתונים עצמם שאנחנו שולחים
+                success: function (data) {
+                    $(".buttonload").css("display", "none");  // hide the loading button
+                    //פונקציה  שתופעל לאחר הצלחה
+                    for (var i = 0; i < data.length; i++) {
+                        $("#PurchaseTable").append(CreatePurchaseTr(data[i], i + 2));
+                    }
+                },
+                error: function (err) {
+                    //פונקציה שתופעל במקרה של שגיאה
+                    $(".buttonload").css("display", "none");
+                    $("#msg").html("An error occured. Try again");
+                }
+            });
+        });
+
+
+        function UpdatePurchases(rowNumber, unitPrice) {
+
+            var Quantity = parseInt($('#PurchaseTable tr').eq(rowNumber).find('input').val());
+
+            if (Quantity > 0 && Quantity <= 999) {
+                var total = (Quantity * unitPrice).toFixed(2);     // accurate 2 numbers after decmial point
+                $('#PurchaseTable tr').eq(rowNumber).find('span').html(total);
+                $('#PurchaseTable tr').eq(rowNumber).css('background-color', 'dodgerblue');
+
+                // update data in db tables call to controller
+                $.ajax({
+                    dataType: "json",
+                    url: "/api/UpdateArtist/" + Quantity,
+                    contentType: "application/json",
+                    type: "POST",
+                    success: function (rowNumber) {
+                        for (var i = 0; i < data.length; i++) {
+                        }
+                    },
+                    error: function (err) {
+                        //פונקציה שתופעל במקרה של שגיאה
+                    }
+                });
+            }
+
+            else  {
+                $('#PurchaseTable tr').eq(rowNumber).find('input').val("0");
+                $('#PurchaseTable tr').eq(rowNumber).find('span').html("0");
+                $('#PurchaseTable tr').eq(rowNumber).css('background-color', 'white');
+                return;
+            }
+        }
+        
+
+
+        function CreatePurchaseTr(Purchase, row) {
+            return `<tr id="PurchseDetails">
+                                    <td>${Purchase.ArtistId}</td>
+                                    <td>${Purchase.ArtistName}</td>
+                                    <td>${Purchase.GenreName}</td>
+                                    <td>${Purchase.AlbumName}</td>
+                                    <td>${Purchase.TrackName}</td>
+                                    <td>${Purchase.UnitPrice}</td>
+                                    <td> <input type="text" value="0" maxlength="3" size="3" style="text-align:center" class="Quantity" id=${row} onchange="UpdatePurchases(this.id,${Purchase.UnitPrice})"> </td>
+                                    <td><span id=TotalPrice>0.00</span></td>
+                                    </tr>`;
+        }
+        
+        function CleanAllPurchases(row) {
+            $(".Quantity").val("0");   // reset all input number buttons in each line
+        }
+
+        function CleanAllPurchases() {
+            $(".Quantity").val("0");   // reset all input number buttons in each line
+            $('#PurchaseTable tr:gt(1)').css('background-color', 'white');
+        }
+ </script>
+
+
+    <script>
+        function FilterByArtistName() {
+            var artistName = document.getElementById("ArtistFilter").value;
+            if (artistName == "") {
+                return;
+            }
+            // http get cannot contains a slash
+            if (artistName.includes("/")) {
+                artistName = artistName.replace("/", "_");
+            }
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:64969/api/FilterByArtistName/" + artistName,
+                contentType: "application/json",
+                type: "GET",
+                success: function (data) {
+                    $("#PurchaseTable").find("tr:gt(1)").remove();
+                    for (var i = 0; i < data.length; i++) {
+                        $("#PurchaseTable").append(CreatePurchaseTr(data[i]));
+                    }
+                },
+                error: function (err) {
+                    //פונקציה שתופעל במקרה של שגיאה
+                    $(".buttonload").css("display", "none");
+                }
+            });
+        }
+
+        function FilterByGenre() {
+            var genre = document.getElementById("GenreFilter").value;
+            if (genre == "") {
+                return;
+            }
+            // http get cannot contains a slash
+            if (genre.includes("/")) {
+                genre = genre.replace("/", "_");
+            }
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:64969/api/FilterByGenre/" + genre,
+                contentType: "application/json",
+                type: "GET",
+                success: function (data) {
+                    $("#PurchaseTable").find("tr:gt(1)").remove();
+                    for (var i = 0; i < data.length; i++) {
+                        $("#PurchaseTable").append(CreatePurchaseTr(data[i]));
+                    }
+                },
+                error: function (err) {
+                    //פונקציה שתופעל במקרה של שגיאה
+                }
+            });
+        }
+
+        function FilterByAlbumName() {
+            var albumName = document.getElementById("AlbumFilter").value;
+            if (albumName == "") {
+                return;
+            }
+            // http get cannot contains a slash
+            if (albumName.includes("/")) {
+                albumName = albumName.replace("/", "_");
+            }
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:64969/api/FilterByAlbumName/" + albumName,
+                contentType: "application/json",
+                type: "GET",
+                success: function (data) {
+                    $("#PurchaseTable").find("tr:gt(1)").remove();
+                    for (var i = 0; i < data.length; i++) {
+                        $("#PurchaseTable").append(CreatePurchaseTr(data[i]));
+                    }
+                },
+                error: function (err) {
+                    //פונקציה שתופעל במקרה של שגיאה
+                }
+            });
+        }
+
+        function FilterByTrackName() {
+            var trackName = document.getElementById("TrackFilter").value;
+            if (trackName == "") {
+                return;
+            }
+            // http get cannot contains a slash
+            if (trackName.includes("/")) {
+                trackName = trackName.replace("/", "_");
+            }
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:64969/api/FilterByTrackName/" + trackName,
+                contentType: "application/json",
+                type: "GET",
+                success: function (data) {
+                    $("#PurchaseTable").find("tr:gt(1)").remove();
+                    for (var i = 0; i < data.length; i++) {
+                        $("#PurchaseTable").append(CreatePurchaseTr(data[i]));
+                    }
+                },
+                error: function (err) {
+                    //פונקציה שתופעל במקרה של שגיאה
+                }
+            });
+        }
+    </script>
+
+</head>
+<body dir="ltr">
+
+    <div style="background-color:greenyellow; height: 50px; width: 1000px">
+        <br />
+        <a href="ManagerReportPage.html">Manager Report</a>
+        <a href="Purchases.html">Purchase</a>
+    </div>
+    <br /> <br />
+    <span id="msg"></span>
+    <button class="buttonload">
+        <i class="fa fa-refresh fa-spin"></i>Loading
+    </button>
+    <button class="buttonUpdate">
+        <i class="fa fa-refresh fa-spin"></i>Updating
+    </button>
+    <br />
+
+    <br /> <br />
+    <input type="reset" value="clear choices" onclick="CleanAllPurchases()">
+    <br />
+
+    <br />
+    <table dir="ltr" id="PurchaseTable">
+        <tr>
+            <th></th>
+            <th> <input id="ArtistFilter" type="text" placeholder="Artist" onkeyup="FilterByArtistName()" />  </th>
+            <th> <input id="GenreFilter" type="text" placeholder="Genre" onkeyup="FilterByGenre()" />  </th>
+            <th> <input id="AlbumFilter" type="text" placeholder="Album" onkeyup="FilterByAlbumName()" />  </th>
+            <th> <input id="TrackFilter" type="text" placeholder="Track" onkeyup="FilterByTrackName()" />  </th>
+            <th colspan="3" id="subTable">  </th>
+        </tr>
+
+        <tr id="HeadersPurchase" style="font-size:large">
+            <th>#</th>
+            <th>Artist</th>
+            <th>Genre</th>
+            <th>Album</th>
+            <th>Track Name</th>
+            <th> Unit Price</th>
+            <th>Quantity</th>
+            <th>Total Price</th>
+        </tr>
+    </table>
+</body>
+</html>

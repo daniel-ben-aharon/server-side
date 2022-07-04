@@ -1,0 +1,278 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>דוח מנהלים</title>
+    <script src="../Scripts/jquery-3.3.1.js"></script>
+    <script>
+        $(document).ready(function () {
+             // show load button when loading the Internet page
+            $(".buttonload").css("display", "inline");
+            $("#UserInput").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                $(".item").filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            })
+
+            $.ajax({
+                dataType: "json",			                  //סוג הנתונים שאנחנו מצפים לקבל מהשרת
+                url: "/api/Report",			                  //הכתובת לשרת ולפונקציה
+                contentType: "application/json",		      //סוג הנתונים שאנחנו שולחים לשרת
+                type: "GET",				                  //סוג הפעולה
+                //data:  JSON.stringify(students),			  //הנתונים עצמם שאנחנו שולחים
+                success: function (data) {
+                    //פונקציה  שתופעל לאחר הצלחה
+                    $(".buttonload").css("display", "none");  // hide the loading button
+                    for (var i = 0; i < data.length; i++) {
+                        $("#ReportTable").append(CreateReportTr(data[i]));
+                    }
+                },
+                error: function (err) {
+                    //פונקציה שתופעל במקרה של שגיאה
+                    $(".buttonload").css("display", "none");
+                    console.log(err);
+                }
+            });
+        });
+
+
+        // get additional data of row after pressing mouse onclick
+        $(document).on("click", "#ReportTable tr:gt(2)", function () {
+            $("#msg").html("Please wait to see data");
+
+            var artistName = $(this).find('td').map(function () {
+                return $(this).text();
+            }).get()[1];
+
+            if (artistName == "") {
+                return;
+            }
+
+            if (artistName.includes('/')) {
+                artistName = artistName.replace('/', '_');
+            }
+
+            var rowTable = this.rowIndex;
+
+            $("#AdditionalReportDetails").find("tr:gt(0)").remove();
+            document.getElementById("AdditionalReportDetails").style.display = "table";
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:64969/api/Report/GetAdditionalDetails/" + artistName + "/" + rowTable ,
+                contentType: "application/json",
+                type: "GET",
+                data: JSON.stringify(),		    //הנתונים עצמם שאנחנו שולחים
+                success: function (data) {
+                    $("#msg").html("");
+                    $(".buttonload").css("display", "none");  // hide the loading button
+                    $("#AdditionalReportDetails").find("tr:gt(0)").remove();
+                    for (var i = 0; i < data.length; i++) {
+                        $("#AdditionalReportDetails").append(CreateAdditionalDetailsTable(data[i]));
+                    }
+                },
+                error: function (err) {
+                    $(".buttonload").css("display", "none");
+                    $("#msg").html("An error occured. Try again");
+                }
+            });
+        });
+
+        function CreateAdditionalDetailsTable(data) {
+            return `<tr>
+                           <td>${data.ArtistName}</td>
+                           <td>${data.customerName}</td>
+                           <td>${data.customerEmail}</td>
+                           <td>${data.invoiceDate}</td>
+                           </tr>`;
+        }
+
+
+        function SearchByArtistName() {
+            var artistName = document.getElementById("ArtistNameFilter").value;
+            if (artistName == "") {
+                return;
+            }
+            $(".buttonload").css("display", "inline");
+             //http get cannot contains a slash
+            if (artistName.includes("/")) {
+                artistName = artistName.replace("/", "_");
+            }
+            $.ajax({
+                dataType: "json",
+                url: "http://localhost:64969/api/CreateReportByArtistName/" + artistName,
+                contentType: "application/json",
+                type: "GET",
+                success: function (data) {
+                    $(".buttonload").css("display", "none");
+                    $("#ReportTable").find("tr:gt(2)").remove();
+                    for (var i = 0; i < data.length; i++) {
+                        $("#ReportTable").append(CreateReportTr(data[i]));
+                    }
+                },
+                error: function (err) {
+                    //פונקציה שתופעל במקרה של שגיאה
+                }
+            });
+        }
+
+        function CreateReportTr(Report) {
+            return `<tr class="Report_Data_Table">
+                                            <td>${Report.ArtistId}</td>
+                                            <td>${Report.Artist}</td>
+                                            <td>${Report.TotalIncome}</td>
+                                            <td>${Report.ReleasedSongsNum}</td>
+                                            </tr>`;
+        }
+
+
+        function Search_By_MinNumSongs() {
+            $(".buttonload").css("display", "inline");
+            var MinNumSongs = $("#MinNumSongs").val();
+            if (MinNumSongs == "")   // if search textarea is empty them return the same table
+                return;
+            $("#ReportTable >tbody").empty();
+            $("#AdditionalReportDetails >tbody").empty();
+
+            $.ajax({
+                dataType: "json",			              //סוג הנתונים שאנחנו מצפים לקבל מהשרת
+                url: "/http://localhost:64969/api/Report/"+ MinNumSongs,      	  //הכתובת לשרת ולפונקציה
+                contentType: "application/json",	      //סוג הנתונים שאנחנו שולחים לשרת
+                type: "GET",				              //סוג הפעולה
+                 // data: JSON.stringify(),    //הנתונים עצמם שאנחנו שולחים
+                success: function (data) {
+                    //פונקציה  שתופעל לאחר הצלחה
+                    if (MinNumSongs < 0) {
+                        $("#msg").html("Number of minimum songs must be a non negative number!");
+                        for (var i = 0; i < data.length; i++) {
+                            $("#workers >tbody").append(createWorkersTr(data[i]));
+                        }
+                    }
+                },
+                      error: function (err) {
+                       //פונקציה שתופעל במקרה של שגיאה
+                        $(".buttonload").css("display", "none");
+                        $("#msg").html("An error occured. Try again");
+                },
+            });
+        }
+
+        function CleanSearch() {
+            $("#ArtistName").val("");
+            $("#MinNumSongs").val("");
+            $("#ReportTable").find("tr:gt(2)").remove();
+            $("#AdditionalReportDetails").find("tr:gt(0)").remove();
+        }
+
+
+    </script>
+
+
+    <style>
+        a {
+            margin: 30px;
+            font-size: medium;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+        }
+
+        #HeadersReport {
+            background-color: darkgrey;
+        }
+
+        #AdditionalReportDetailsHeader
+        {
+            background-color:greenyellow;
+        }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+            padding: 12px;
+        }
+
+        .buttonload, .buttonUpdate {
+            background-color: blue;
+            border: 0;
+            color: white;
+            padding: 12px 20px;
+            font-size: 20px;
+            display: none;
+            position:center;
+        }
+
+        span {
+            color: cornflowerblue;
+            font-size: large;
+            font-family: 'David';
+            margin: 20px;
+        }
+
+        thead, tbody {
+            display: block;
+        }
+
+        tbody {
+            height: 200px;      /* Just for the demo          */
+            overflow-y: auto;   /* Trigger vertical scroll    */
+            overflow-x: hidden; /* Hide the horizontal scroll */
+        }
+
+        .Report_Data_Table:hover {
+            background-color: yellow !important;
+        }
+
+        .div {
+            background-color: forestgreen;
+            width: 100px;
+            height: 40px;
+        }
+    </style>
+
+</head>
+<body>
+    <div style="background-color:greenyellow; height: 50px; width: 1000px">
+        <br />
+        <a href="ManagerReportPage.html">Manager Report</a>
+        <a href="Purchases.html">Purchase</a>
+    </div>
+    <br />
+    <input type="text" placeholder="Min Number of songs of artist" id="MinNumSongs" />
+    <input type="button" value="search" onclick="Search_By_MinNumSongs()" />
+    <input type="button" value="clean search" onclick="CleanSearch()" />
+    <br />    <br />
+    <button class="buttonload">
+        <i class="fa fa-refresh fa-spin"></i>Loading
+    </button>
+    <br />
+
+    <br /> <br />
+    <span id="msg"></span>
+    <table id="ReportTable">
+        <tr>
+        <tr>
+            <td colspan="6">
+                <div dir="ltr" style="text-align:left">
+                    <input type="text" placeholder="filter by artist name" id="ArtistNameFilter" style="position:relative" onkeyup="SearchByArtistName()" />
+                </div>
+            </td>
+        </tr>
+        <tr id="HeadersReport">
+            <th>Artist Id</th>
+            <th>Artist</th>
+            <th>Total Income</th>
+            <th>Total released songs</th>
+        </tr>
+    </table>
+
+    <br />
+    <br /><br />
+    <table id="AdditionalReportDetails" style="display: none;">
+        <tr id="AdditionalReportDetailsHeader">
+            <th>Artist</th>
+            <th>Customer Name</th>
+            <th>Customer Email</th>
+            <th>Invoice date</th>
+        </tr>
+    </table>
+</body>
+</html>

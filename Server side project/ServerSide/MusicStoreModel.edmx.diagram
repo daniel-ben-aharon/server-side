@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="8012d918f48e408a9dd83320d54b5ba9" Name="Diagram1" ZoomLevel="83">
+        <EntityTypeShape EntityType="MusicStoreModel.Album" Width="1.5" PointX="3" PointY="1.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="MusicStoreModel.Artist" Width="1.5" PointX="0.75" PointY="2.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="MusicStoreModel.Customer" Width="1.5" PointX="3" PointY="14.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="MusicStoreModel.Employee" Width="1.5" PointX="0.75" PointY="14" IsExpanded="true" />
+        <EntityTypeShape EntityType="MusicStoreModel.Genre" Width="1.5" PointX="3" PointY="5.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="MusicStoreModel.Invoice" Width="1.5" PointX="5.25" PointY="14.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="MusicStoreModel.InvoiceLine" Width="1.5" PointX="7.5" PointY="1.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="MusicStoreModel.MediaType" Width="1.5" PointX="3" PointY="8" IsExpanded="true" />
+        <EntityTypeShape EntityType="MusicStoreModel.Playlist" Width="1.5" PointX="3" PointY="10.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="MusicStoreModel.Track" Width="1.5" PointX="5.25" PointY="1" IsExpanded="true" />
+        <AssociationConnector Association="MusicStoreModel.FK_AlbumArtistId" ManuallyRouted="false" />
+        <AssociationConnector Association="MusicStoreModel.FK_TrackAlbumId" ManuallyRouted="false" />
+        <AssociationConnector Association="MusicStoreModel.FK_CustomerEmployeeId" ManuallyRouted="false" />
+        <AssociationConnector Association="MusicStoreModel.FK_InvoiceCustomerId" ManuallyRouted="false" />
+        <AssociationConnector Association="MusicStoreModel.FK_EmployeeReportsTo" ManuallyRouted="false" />
+        <AssociationConnector Association="MusicStoreModel.FK_TrackGenreId" ManuallyRouted="false" />
+        <AssociationConnector Association="MusicStoreModel.FK_InvoiceLineInvoiceId" ManuallyRouted="false" />
+        <AssociationConnector Association="MusicStoreModel.FK_InvoiceLineTrackId" ManuallyRouted="false" />
+        <AssociationConnector Association="MusicStoreModel.FK_TrackMediaTypeId" ManuallyRouted="false" />
+        <AssociationConnector Association="MusicStoreModel.PlaylistTrack" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
